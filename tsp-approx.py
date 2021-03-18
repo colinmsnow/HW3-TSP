@@ -10,6 +10,7 @@ Please don't look at it unless you are absolutely stuck, even after hours!
 
 # Import math.
 import math
+import itertools
 ################################################################################
 
 """
@@ -70,10 +71,67 @@ Its cost is at most twice the optimal solution
 It should be an array of cities visited in the tour, in the order visited.
 The cities should be denoted by their rank (their numbering in adjList).
 """
-def tsp(adjList, start):
+def tsp(adjList, start, adjMat):
     ##### Your implementation goes here. #####
 
-    return tour
+
+    # print(adjList)
+    # print(start)
+    # print(adjMat)
+    prim(adjList, adjMat)
+
+    # for each node all neighbours that arent the parent are children ??
+
+    # print("START IS: " + str(start))
+
+    for i in adjList:
+        if i.prev == None:
+            start = i
+    # print("Start: " + str(start))
+    # print("ADJUSTED START IS: " + str(start))
+
+    for i in adjList:
+        children = [x for x in i.mstN if x!= i.prev]
+        # print (str(i) + ": " + str(children))
+
+    initial_tour = dfs(start, adjList, [])
+    # print(initial_tour)
+
+    initial_tour_rank = [i.rank for i in initial_tour]
+
+    # print("INITIAL TOUR RANK: " + str(initial_tour_rank))
+
+    tour_unduplicated = []
+    tour_set = set()
+
+    for i in initial_tour_rank:
+        if i not in tour_set:
+            tour_set.add(i)
+            tour_unduplicated.append(i)
+
+    tour_list = tour_unduplicated + [initial_tour_rank[0]]
+    # print("TOUR LIST: " + str(tour_list))
+
+    return tour_list
+
+
+
+def dfs(current_node, adjList, node_list):
+
+    node_list.append(current_node)
+    children = [x for x in current_node.mstN if x!= current_node.prev]
+
+    if children == []:
+        return node_list
+
+    for i in children:
+        dfs(i, adjList, node_list)
+    node_list.append(current_node)
+
+    return node_list
+
+
+    
 
 ################################################################################
 
@@ -305,7 +363,6 @@ class Map:
 
         # Sort the edges.
         self.edgeList.sort()
-
         # Set start to the 0 ranked vertex (the first city).
         self.start = self.adjList[0]
 
@@ -409,12 +466,15 @@ class Map:
     """
     def getTSPApprox(self):
         if len(self.mst) > 0:
+            
+            tour = tsp(self.adjList, self.start, self.adjMat)
+            self.tour = tour
             ### TODO ###
             # Complete the TSP Approximation method here
             # Update the Map object with the TSP Approximate tour
         else:
             raise Exception('No MST set!')
-        return
+        return tour
 
     """
     getTSPOptimal: brute-force approach to finding the optimal tour.
@@ -423,7 +483,49 @@ class Map:
         ### TODO ###
         # Complete a brute-force TSP solution!
         # Replace the following two lines with an actual implementation.
-        self.tourOpt = getMap(self.mapNum)[3]
+
+
+        best_score = math.inf
+        best_tour = None
+        
+
+        # for e in m.mst:
+        #     w += e.weight
+
+        # numcalcs = math.factorial(len(self.adjList))
+        # print("NUMBER OF CALCULATIONS: " + str(numcalcs))
+
+        for i in itertools.permutations(self.adjList):
+            # a permutation
+
+            i = i+(i[0],)
+
+            wO = 0
+            for r in range(0,len(i)-1):
+                wO += self.adjMat[i[r].rank][i[r+1].rank]
+
+            # wO += self.adjMat[i[0].rank][i[-1].rank]
+            
+            if wO < best_score:
+                best_score = wO
+                best_tour = i
+
+        # print("BEST TOUR IS: " + str(best_tour))
+
+        best_tour_rank = [i.rank for i in best_tour]
+        self.tourOpt = best_tour_rank
+
+
+
+
+
+
+
+
+
+
+
+        # self.tourOpt = getMap(self.mapNum)[3]
         return None
 
     """
@@ -722,6 +824,8 @@ def testMSTApprox():
                 Tflag = True
             else:
                 if w > 2*MSTw+2*tol:
+                    print("WEIGHT: " + str(w))
+                    print("BOUND: " + str(2*MSTw+2*tol))
                     print('Test %d: TSP too large.' % ind)
                     Tflag = True
                 if w <= MSTw-tol:
@@ -738,11 +842,21 @@ def testMSTApprox():
             if ind == 7:
                 ans = 40030.173592
                 if (w < ans - tol) or (w > ans + tol):
+                    # m.getTSPOptimal()
+                    print("TSP IS: " + str(m.tour))
+                    print("TSP WEIGHT IS: " + str(w))
+                    # print("CORRECT IS: " + str(m.tourOpt))
+                    print("CORRECT WEIGHT IS: " + str(ans))
                     print('Test %d: Wrong TSP!' % ind)
                     Tflag = True
             if ind == 8:
                 ans = 79526.611536
                 if (w < ans - tol) or (w > ans + tol):
+                    # m.getTSPOptimal()
+                    print("TSP IS: " + str(m.tour))
+                    print("TSP WEIGHT IS: " + str(w))
+                    # print("CORRECT IS: " + str(m.tourOpt))
+                    print("CORRECT WEIGHT IS: " + str(ans))
                     print('Test %d: Wrong TSP!' % ind)
                     Tflag = True
         else:
