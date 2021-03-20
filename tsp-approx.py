@@ -74,32 +74,13 @@ The cities should be denoted by their rank (their numbering in adjList).
 def tsp(adjList, start, adjMat):
     ##### Your implementation goes here. #####
 
-
-    # print(adjList)
-    # print(start)
-    # print(adjMat)
     prim(adjList, adjMat)
 
     # for each node all neighbours that arent the parent are children ??
 
-    # print("START IS: " + str(start))
-
-    for i in adjList:
-        if i.prev == None:
-            start = i
-    # print("Start: " + str(start))
-    # print("ADJUSTED START IS: " + str(start))
-
-    for i in adjList:
-        children = [x for x in i.mstN if x!= i.prev]
-        # print (str(i) + ": " + str(children))
-
     initial_tour = dfs(start, adjList, [])
-    # print(initial_tour)
-
     initial_tour_rank = [i.rank for i in initial_tour]
 
-    # print("INITIAL TOUR RANK: " + str(initial_tour_rank))
 
     tour_unduplicated = []
     tour_set = set()
