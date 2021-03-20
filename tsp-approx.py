@@ -78,20 +78,24 @@ def tsp(adjList, start, adjMat):
 
     # for each node all neighbours that arent the parent are children ??
 
+    # print(adjList)
+
     initial_tour = dfs(start, adjList, [])
+
     initial_tour_rank = [i.rank for i in initial_tour]
+
+
 
 
     tour_unduplicated = []
     tour_set = set()
 
-    for i in initial_tour_rank:
+    for i in reversed(initial_tour_rank):
         if i not in tour_set:
             tour_set.add(i)
             tour_unduplicated.append(i)
 
     tour_list = tour_unduplicated + [initial_tour_rank[0]]
-    # print("TOUR LIST: " + str(tour_list))
 
     return tour_list
 
@@ -101,13 +105,19 @@ def dfs(current_node, adjList, node_list):
 
     node_list.append(current_node)
     children = [x for x in current_node.mstN if x!= current_node.prev]
+    # print(str(current_node) + "->" + str( children))
 
-    if children == []:
-        return node_list
+    # print(len(children))
+
+    # if children == []:
+    #     return
 
     for i in children:
+        
+        # visited.append(i)
         dfs(i, adjList, node_list)
-    node_list.append(current_node)
+        node_list.append(current_node)
+    
 
     return node_list
 
